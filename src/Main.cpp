@@ -71,7 +71,7 @@ private:
 
     for(auto it=timers.begin(); it != timers.end(); ++it){
       //ITimer *timer = *it;
-      tasks++;
+      //tasks++;
       if((*it)->GetTimeout(&timeout) == 0){
         if((*it)->isComplete())
         {
@@ -90,7 +90,7 @@ private:
 
     //for(auto it=sockets.begin(); it != sockets.end(); ++it){
     for(auto it=sockets.begin(), end=sockets.end(); it != end; ++it){
-      tasks++;
+      //tasks++;
       if((*it)->isClose())
       {
         sockets.remove(*it);
@@ -107,7 +107,7 @@ private:
       if( (*it)->getExceptReady() )
         FD_SET( (*it)->getfd(), &exfds );
     }
-    if(tasks == 0)
+    if(sockets.empty() && timers.empty())
     {
       //std::cout << "Complete IPoll Handler. " << std::endl;
       tv.tv_sec  = 0;
