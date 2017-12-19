@@ -444,25 +444,33 @@ public:
           unsigned int tv_delay;// = (tv.tv_sec - timestamp.tv_sec)*1000 + (tv.tv_usec - timestamp.tv_usec)/1000;
           struct timeval tv;
           char buffer[1024];
+          char *p;
           memset(buffer,0,sizeof(buffer));
           len = ::recv(sock,buffer,sizeof(buffer),0);
           close(sock);
           gettimeofday(&tv,NULL);
-          tv_delay = (tv.tv_sec - timestamp.tv_sec)*1000;
-          if(tv.tv_usec >=  timestamp.tv_usec)
-            tv_delay += (tv.tv_usec - timestamp.tv_usec)/1000;
-          else
-            tv_delay -= (timestamp.tv_usec - tv.tv_usec)/1000;
-          if(requests_complete == 0)
-          {
-            delay_avr = 0;
-            delay_min = delay_max = tv_delay;
+          if(len){
+            p = strstr(buffer," 200 ");
+            if(p){
+              tv_delay = (tv.tv_sec - timestamp.tv_sec)*1000;
+              if(tv.tv_usec >=  timestamp.tv_usec)
+                tv_delay += (tv.tv_usec - timestamp.tv_usec)/1000;
+              else
+                tv_delay -= (timestamp.tv_usec - tv.tv_usec)/1000;
+              if(requests_complete == 0)
+              {
+                delay_avr = 0;
+                delay_min = delay_max = tv_delay;
+              }
+              if(tv_delay < delay_min)
+                delay_min = tv_delay;
+              if(tv_delay > delay_max)
+                delay_max = tv_delay;
+              delay_avr += tv_delay;
+            } else {
+              len = 0;
+            }
           }
-          if(tv_delay < delay_min)
-            delay_min = tv_delay;
-          if(tv_delay > delay_max)
-            delay_max = tv_delay;
-          delay_avr += tv_delay;
           if(len == 0)
           {
             start_delay(1);
